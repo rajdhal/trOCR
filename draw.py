@@ -4,6 +4,7 @@ import os
 import numpy as np
 import predict_crop
 import trocr
+import namecheck
 
 # Draws the bounding boxes around each name, and then sends them to trOCR for recognition
 def draw_BBOX(img):
@@ -28,7 +29,7 @@ def draw_BBOX(img):
         
         if (text == 'FIRST NAME' or text == 'First Name'): firstName_BBOX = bbox
         elif (text == 'PROGRAM' or text == 'Program'): program_BBOX = bbox
-        #elif (text == 'LAST NAME' or text == 'Last Name'): lastName_BBOX = bbox
+        elif (text == 'LAST NAME' or text == 'Last Name'): lastName_BBOX = bbox
         #elif (text == 'SIGNATURE' or text == 'Signature'): signature_BBOX = bbox
             
     # Output BBoxes that are between the range of first name header up to program header
@@ -61,11 +62,12 @@ def draw_BBOX(img):
             i += 1
             # Create and save cropped image_clean based on bounding box
             cropped_image = img_clean[y1:y2, x1:x2]
-            image_path = os.path.join(output_folder, f"cropped_image_{i}.png")
-            cv2.imwrite(image_path, cropped_image)
+            #image_path = os.path.join(output_folder, f"cropped_image_{i}.png")
+            #cv2.imwrite(image_path, cropped_image)
             
             # Detect names using trOCR
-            name = trocr.text_detection(img_clean[y1:y2, x1:x2])
+            name = trocr.text_detection(cropped_image)
+            name = namecheck.check(name)
             names.append(name)
             
             # Draw bounding box on image_np

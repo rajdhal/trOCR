@@ -5,3 +5,5 @@ gradio
 transformers
 ultralytics
 Pillow
+sqlite3
+editdistance
