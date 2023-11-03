@@ -1,9 +1,8 @@
-cv2
+opencv-python
 easyocr
 numpy
 gradio
 transformers
 ultralytics
 Pillow
-sqlite3
 editdistance
