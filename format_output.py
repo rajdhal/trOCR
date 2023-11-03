@@ -1,6 +1,7 @@
 def format(bbox_name_pairs):
-    # easyOCR doesn't put bboxes in order, have to sort them using the sort key function
-    bbox_name_pairs = sorted(bbox_name_pairs, key=sort_key)
+    # easyOCR doesn't put bboxes in order, sort based on y-coord first
+    bbox_name_pairs = sorted(bbox_name_pairs, key=lambda bbox: round(bbox[1][0][1] / 32))
+    
     
     previous_pairs = None   # Store the previous pair of bbox and names to compare to the next
     all_names = []          # Stores final list of lists, where inner list contains full name of one person
@@ -8,29 +9,42 @@ def format(bbox_name_pairs):
     
     # sketchy for loop I made that works
     for name, bbox in bbox_name_pairs:
+        current_x1 = int(bbox[0][0])
         current_y1, current_y2 = bbox[0][1], bbox[2][1]
         midpoint_y = (current_y1 + current_y2) // 2
         
         # If not on first iteration of for loop
         if previous_pairs is not None:
             previous_name = previous_pairs[0]
+            previous_x1 = int(previous_pairs[1][0][0])
             previous_y1, previous_y2 = previous_pairs[1][0][1], previous_pairs[1][2][1]
 
-            if not fullname: fullname.append(previous_name) # Only executes on second iteration
+            if not fullname: fullname.append([previous_name, previous_x1]) # Only executes on second iteration
             
             # if current names bbox matches previous, append current name to fullname - (bboxes are on same row thus same person)
             # else, write fullname to all_names and set fullname to contain new persons first name
             if (midpoint_y >= previous_y1 and midpoint_y <= previous_y2):
-                fullname.append(name)
+                fullname.append([name, current_x1])
             else:
-                all_names.append(fullname)
-                fullname = [name]
+                # Sort first and last name (or middle) based on x coord
+                fullname = sorted(fullname, key = lambda x: x[1])
+                temp_name = []
+                for list in fullname:
+                    temp_name.append(list[0])
+                    
+                all_names.append(temp_name)
+                fullname = [[name, current_x1]]
         
         # Store previous names bbox for future comparison
         previous_pairs = [name, bbox]
     
-    # Once for loop finishes, fullname will have contents - write them   
-    all_names.append(fullname)
+    # Once for loop finishes, fullname will have contents - write them
+    temp_name =[]
+    for list in fullname: 
+        temp_name.append(list[0])
+        
+    all_names.append(temp_name)
+    
     
     # Convert list of lists to string
     final = ""
@@ -41,17 +55,8 @@ def format(bbox_name_pairs):
         
     return final
 
-# Sort key chooses y-coord rounded to 32 as first comparison, if same, will then sort by x-coord
-# Still get errors if theyre too far away - not great
-def sort_key(bbox):
-    y_coordinate = round(bbox[1][0][1] / 32)
-    x_coordinate = bbox[1][0][0]
-    return (y_coordinate, x_coordinate)
-
-
-
-
-# Debugging sort function  
+'''
+# Debugging output function  
 text_ = [['muhammad', [[99, 277], [209, 277], [209, 315], [99, 315]]], ['ali', [[288, 276], [336, 276], [336, 306], [288, 306]]], 
          ['sonia', [[103, 308], [187, 308], [187, 352], [103, 352]]], [' ngoyen', [[275, 308], [383, 308], [383, 357], [275, 357]]], 
          [' priya secret', [[104, 354], [248, 354], [248, 386], [104, 386]]], ['patel', [[284, 352], [362, 352], [362, 378], [284, 378]]], 
@@ -84,4 +89,5 @@ text_ = [['muhammad', [[99, 277], [209, 277], [209, 315], [99, 315]]], ['ali', [
          [' santiago', [[108.05576303174938, 823.0899677650967], [220.9221378775424, 843.1210468075817], [211.94423696825064, 884.9100322349033], [99.07786212245759, 864.8789531924183]]], 
          ['wang', [[297.1970684086417, 866.1094462711102], [384.9377812585213, 877.3921831878921], [379.8029315913583, 907.8905537288898], [292.0622187414787, 896.6078168121079]]]]
 
-#print(format(text_))
+print(format(text_))
+'''
