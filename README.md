@@ -71,10 +71,6 @@ We welcome contributions from the University of Windsor community and the open-s
 4. Push your changes to your fork.
 5. Create a pull request back to this repository.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ---
 
 We hope that the University of Windsor Text Recognition (UW-TR) project simplifies text recognition tasks for the university community. If you have any questions, feedback, or suggestions, please don't hesitate to reach out. We look forward to collaborating with you to improve and expand this application.
