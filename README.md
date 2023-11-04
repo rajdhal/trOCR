@@ -1,6 +1,6 @@
 # University of Windsor 4990/4690 Sign-In Sheet Text Recognizer (UW-TROCR)
 
-Welcome to the University of Windsor Text Recognition (UW-TR) project! This open-source repository is dedicated to helping the University of Windsor community streamline the process of recognizing text from forms using Microsoft's trOCR technology. With Gradio, a user-friendly web interface, this project enables easy interaction with the underlying machine learning model for text recognition.
+Welcome to the University of Windsor Text Recognition project! This open-source repository is dedicated to helping the University of Windsor community streamline the process of recognizing text from forms using a customized version of Microsoft's trOCR technology. With Gradio, a user-friendly web interface, this project enables easy interaction with the underlying machine learning model for text recognition.
 
 ## Features
 
