@@ -21,3 +21,4 @@ def create_name_database():
     conn.commit()
     conn.close()
 
+create_name_database()

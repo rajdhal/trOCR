@@ -69,6 +69,7 @@ def draw_BBOX(img):
             
             # Detect names using trOCR
             name = trocr.text_recognition(cropped_image)
+            name = name.strip()
             name = namecheck.check(name)
             
             #all_names.append(name)
