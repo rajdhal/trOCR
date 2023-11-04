@@ -4,7 +4,7 @@ import re
 processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
 model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
 
-def text_detection(image):    
+def text_recognition(image):    
     # prepare image
     pixel_values = processor(image, return_tensors="pt").pixel_values
 
@@ -24,5 +24,3 @@ def text_detection(image):
             final_text = final_text + " " + name
             
     return final_text
-    
-    # TODO: perform word beam search against census list of names to increase certainty?

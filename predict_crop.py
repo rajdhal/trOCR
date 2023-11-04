@@ -4,6 +4,8 @@ from PIL import Image
 def IdentifyForm(image):
     model = YOLO('weights/best.pt')  # load our custom model
     result = model(image)
+    x1, y1 = 0, 0
+    x2, y2 = image.size
     
     # Best Bounding Box
     bestBox = None

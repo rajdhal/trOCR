@@ -30,9 +30,7 @@ def draw_BBOX(img):
         
         if (text == 'FIRST NAME' or text == 'First Name'): firstName_BBOX = bbox
         elif (text == 'PROGRAM' or text == 'Program'): program_BBOX = bbox
-        elif (text == 'LAST NAME' or text == 'Last Name'): lastName_BBOX = bbox
-        #elif (text == 'SIGNATURE' or text == 'Signature'): signature_BBOX = bbox
-            
+        
     # Output BBoxes that are between the range of first name header up to program header
     all_names = []
     bbox_name_pairs = []
@@ -47,7 +45,7 @@ def draw_BBOX(img):
         allowed_y_range = firstName_BBOX[2][1]
     
     # Iterate over each detected text BBOX by easyOCR
-    i = 0 # Counter for cropped image file name
+    #i = 0 # Counter for cropped image file name
     for t in text_:
         bbox, text, score = t
         x1, y1 = bbox[0]
@@ -63,14 +61,14 @@ def draw_BBOX(img):
         
         # Check if the bounding box is in the correct columns
         if ((midpoint_x < allowed_x_range) and (midpoint_y > allowed_y_range)):
-            i += 1
+            #i += 1
             # Create and save cropped image_clean based on bounding box
             cropped_image = img_clean[y1:y2, x1:x2]
             #image_path = os.path.join(output_folder, f"cropped_image_{i}.png")
             #cv2.imwrite(image_path, cropped_image)
             
             # Detect names using trOCR
-            name = trocr.text_detection(cropped_image)
+            name = trocr.text_recognition(cropped_image)
             name = namecheck.check(name)
             
             #all_names.append(name)
@@ -78,12 +76,11 @@ def draw_BBOX(img):
             
             # Draw bounding box on image_np
             cv2.rectangle(img_np, (x1, y1), (x2, y2), (0, 255, 0), 1)
-            cv2.putText(img_np, name, (x1, y1),cv2.FONT_HERSHEY_COMPLEX, 0.65, (255, 0, 0), 2)
-            
-    all_names = format_output.format(bbox_name_pairs)
+            cv2.putText(img_np, name, (x1, y1),cv2.FONT_HERSHEY_COMPLEX, 0.65, (255, 0, 0), 2)    
+
+    if (format_output.format(bbox_name_pairs)):
+        output = "output.csv"
+    else:
+        output = None
     
-    # Weird edge case where easyOCR doesnt see anything in the image, let trOCR handle it
-    if (len(all_names) == 1 and all_names[0] == ''):
-        return trocr.text_detection(img), img
-    
-    return all_names, img_np
+    return img_np, output, output
