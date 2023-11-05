@@ -1,6 +1,7 @@
 import gradio as gr
 import os
-import draw
+import draw as draw
+
 
 title = "Interactive Demo of our 4990 Form Reader"
 description = "Demo of our 499 project"
