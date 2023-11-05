@@ -1,8 +1,8 @@
 from transformers import TrOCRProcessor, VisionEncoderDecoderModel
 import re
 
-processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
-model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
+processor = TrOCRProcessor.from_pretrained("microsoft/trocr-large-handwritten")
+model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-large-handwritten")
 
 def text_recognition(image):    
     # prepare image
