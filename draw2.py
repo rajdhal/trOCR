@@ -3,8 +3,8 @@ import numpy as np
 import predict_crop
 import trocr
 import namecheck
-import format_output
 import pandas as pd
+import name_crop
 
 
 Y_OVERLAP_THRESHOLD = 0.15
@@ -76,10 +76,9 @@ def draw_BBOX(img):
         names_in_row = []
         for i in range(2):
             (x, y, w, h, cX, cY) = row[i]
-            name_crop = img[y:y + h, x:x + w]
-
+            
             # OCR
-            name = trocr.text_recognition(name_crop)
+            name = trocr.text_recognition(name_crop.name_crop(img[y:y + h + 5, x:x + w]))
             name = name.strip()
             if i == 0:
                 name = namecheck.check(name, False)
