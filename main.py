@@ -18,4 +18,4 @@ demo = gr.Interface(fn=draw.draw_BBOX,
                     description=description,
                     examples=images)
 
-demo.launch()
+demo.queue().launch()
