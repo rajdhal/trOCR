@@ -30,13 +30,13 @@ Before you get started, ensure you have the following prerequisites in place:
 1. Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/rajdhal/uw-trOCR.git
+git clone https://github.com/rajdhal/trOCR.git
 ```
 
 2. Navigate to the project directory:
 
 ```bash
-cd uw-trOCR
+cd trOCR
 ```
 
 3. Install the required dependencies using pip:
