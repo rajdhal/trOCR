@@ -3,8 +3,8 @@ import os
 import draw as draw
 
 # Title and description that are on webpage
-title = "Interactive Demo of our 4990 Form Reader"
-description = "Demo of our 499 project"
+title = "Automated 4990/4690 Attendance Sheet Name Parser"
+description = "By: Rajan Dhaliwal, Greg Sun, Kelen LeClair and Thomson Ly"
 
 # Load in demo images from the example_images folder, if it exists
 if os.path.exists("example_images"): images = [f"example_images/{image}" for image in os.listdir("example_images")]
