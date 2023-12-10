@@ -39,7 +39,17 @@ git clone https://github.com/rajdhal/trOCR.git
 cd trOCR
 ```
 
-3. Install the required dependencies using pip:
+3. (Optional) Create and activate a virtual environment (recommended for better dependency management):
+
+```bash
+python -m venv venv
+```
+```bash
+source venv/bin/activate
+```
+
+
+4. Install the required dependencies using pip:
 
 ```bash
 pip install -r requirements.txt
