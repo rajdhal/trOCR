@@ -1,6 +1,6 @@
-# University of Windsor 4990/4960 Sign-In Sheet Name Recognizer (UW-TROCR)
+# University of Windsor 4990/4960 Sign-In Sheet Name Recognizer
 
-Welcome to the University of Windsor Text Recognition project! This open-source repository is dedicated to helping the University of Windsor community streamline the process of recognizing text from forms using a customized version of Microsoft's trOCR technology. With Gradio, a user-friendly web interface, this project enables easy interaction with the underlying machine learning model for text recognition.
+Welcome to the University of Windsor's SmartCampus Text Recognition project! This open-source repository is dedicated to helping the University of Windsor community streamline the process of recognizing text from forms using a customized version of Microsoft's trOCR technology. With Gradio, a user-friendly web interface, this project enables easy interaction with the underlying machine learning model for text recognition.
 
 ## Features
 
@@ -22,7 +22,7 @@ Welcome to the University of Windsor Text Recognition project! This open-source 
 
 Before you get started, ensure you have the following prerequisites in place:
 
-- Python 3.7+
+- Python 3.10+
 - Pip package manager
 
 ## Installation
@@ -42,7 +42,7 @@ cd trOCR
 3. (Optional) Create and activate a virtual environment (recommended for better dependency management):
 
 ```bash
-python -m venv venv
+python3 -m venv venv
 ```
 ```bash
 source venv/bin/activate
@@ -60,7 +60,7 @@ pip install -r requirements.txt
 1. Run the Gradio web application:
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 2. Open your web browser and navigate to `http://localhost:7860` (by default).
@@ -83,4 +83,4 @@ We welcome contributions from the University of Windsor community and the open-s
 
 ---
 
-We hope that the University of Windsor Text Recognition (UW-TR) project simplifies text recognition tasks for the university community. If you have any questions, feedback, or suggestions, please don't hesitate to reach out. We look forward to collaborating with you to improve and expand this application.
+We hope that the University of Windsor's SmartCampus Text Recognition project simplifies text recognition tasks for the university community. If you have any questions, feedback, or suggestions, please don't hesitate to reach out. We look forward to collaborating with you to improve and expand this application.
