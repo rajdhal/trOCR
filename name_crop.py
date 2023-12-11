@@ -1,13 +1,14 @@
 import cv2 as cv
 
-
+# WIP
+# Find a better crop of each cell bounding box from draw2
 def name_crop(img):
     crop = img.copy()
     # Convert to grayscale
     crop = cv.cvtColor(crop, cv.COLOR_BGR2GRAY)
     crop = cv.threshold(crop, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
 
-    # Remove top and side borders
+    # Remove top and side borders by shaving the crop closer to the center
     crop = crop[5:crop.shape[0], 5:crop.shape[1] - 6]
 
     y2 = crop.shape[0]
