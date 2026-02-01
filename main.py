@@ -7,7 +7,9 @@ title = "Automated 4990/4690 Attendance Sheet Name Parser"
 description = "By: Rajan Dhaliwal, Greg Sun, Kelen LeClair and Thomson Ly"
 
 # Load in demo images from the example_images folder, if it exists
-if os.path.exists("example_images"): images = [f"example_images/{image}" for image in os.listdir("example_images")]
+images = []
+if os.path.exists("example_images"): 
+    images = [f"example_images/{image}" for image in os.listdir("example_images")]
 
 demo = gr.Interface(fn=draw.draw_BBOX, 
                     inputs=gr.Image(type="pil", label="Upload an image"),

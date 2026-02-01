@@ -5,6 +5,17 @@ import easyocr
 import trocr
 import namecheck2 as namecheck
 import csv
+import tempfile
+import os
+
+# Initialize EasyOCR reader once at module level to avoid repeated loading
+_easyocr_reader = None
+
+def _get_easyocr_reader():
+    global _easyocr_reader
+    if _easyocr_reader is None:
+        _easyocr_reader = easyocr.Reader(['en'])
+    return _easyocr_reader
 
 # Draws the bounding boxes around each name, and then sends them to trOCR for recognition
 def draw_BBOX(img):
@@ -20,7 +31,7 @@ def draw_BBOX(img):
     
     # Use easyOCR to first detect and attempt to read EVERY name on the form
     # (SLOW AND NOT ACCURATE - used just to see where column headers are)
-    reader = easyocr.Reader(['en'])
+    reader = _get_easyocr_reader()
     text_ = reader.readtext(img_np)
 
     # Obtain the bounding box (BBOX) coordinates for the column headers
@@ -28,14 +39,18 @@ def draw_BBOX(img):
     firstName_BBOX, program_BBOX = None, None
     for t in text_:
         bbox, text, score = t
-        if (text == 'FIRST NAME' or text == 'First Name'): firstName_BBOX = bbox
-        elif (text == 'PROGRAM' or text == 'Program'): program_BBOX = bbox
+        text_upper = text.upper()
+        if text_upper == 'FIRST NAME': 
+            firstName_BBOX = bbox
+        elif text_upper == 'PROGRAM': 
+            program_BBOX = bbox
         
         # Artificially increase size of bounding boxes for better recognition
-        bbox[0][0] = int(bbox[0][0]) - 5    # Top left corner x value
-        bbox[0][1] = int(bbox[0][1])        # Top left corner y value
-        bbox[2][0] = int(bbox[2][0]) + 20   # Bottom right x value
-        bbox[2][1] = int(bbox[2][1])        # Bottom right y value
+        # Clamp to image boundaries to prevent negative indices
+        bbox[0][0] = max(0, int(bbox[0][0]) - 5)    # Top left corner x value
+        bbox[0][1] = max(0, int(bbox[0][1]))        # Top left corner y value
+        bbox[2][0] = min(img_np.shape[1], int(bbox[2][0]) + 20)   # Bottom right x value
+        bbox[2][1] = min(img_np.shape[0], int(bbox[2][1]))        # Bottom right y value
 
         # Extract and keep only the BBOX coordinates of each image
         # Discard easyOCR's detected text and confidence scores
@@ -57,6 +72,14 @@ def draw_BBOX(img):
     # inner array contains the firstName, lastName bbox coords of that student
     sorted_bboxes = sort_and_correct(bboxes, allowed_x_range, allowed_y_range)
 
+    # Handle empty results
+    if not sorted_bboxes or (len(sorted_bboxes) == 1 and not sorted_bboxes[0]):
+        # Return empty results if no valid bboxes found
+        fd, output_path = tempfile.mkstemp(suffix='.csv', prefix='attendance_')
+        with os.fdopen(fd, mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(["First Name", "Last Name"])
+        return img_np, [], output_path
     
     # Use bbox coords of a name to crop each image to just the name, then run
     # trOCR name recognition on each of these cropped images
@@ -92,32 +115,42 @@ def draw_BBOX(img):
         fullname = []               # Reset fullname list
 
     # Format data for writing to CSV
-    output = "output.csv"
     csv_data = []
     for fullname in all_names:
+        if not fullname:
+            continue
+        combined_first_name = ""
         for i, name in enumerate(fullname, start=1):         # Inner loop that accounts for middle names
             name = name.strip().capitalize()                 # Remove whitespace and capitalize name
-            if (i == 1):                  
+            if i == 1:                  
                 combined_first_name = name                   # Add first name to variable combined_first_name
-            elif (i != len(fullname)):                  
+            elif i != len(fullname):                  
                 combined_first_name += " " + name            # Continually add any middle names etc. to variable (WILL NOT ADD LAST NAME)
             else:
                 csv_data.append([combined_first_name, name]) # Add first name/middle name to first element of list, last name as second element
 
-    # Write above formatted data to the CSV file
-    with open(output, mode='w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(["First Name", "Last Name"])
-        csv_writer.writerows(csv_data)
+    # Write to a temp file to avoid race conditions with concurrent requests
+    fd, output_path = tempfile.mkstemp(suffix='.csv', prefix='attendance_')
+    try:
+        with os.fdopen(fd, mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(["First Name", "Last Name"])
+            csv_writer.writerows(csv_data)
+    except Exception:
+        os.close(fd)
+        raise
     
     # Returns final image and CSV file for output to gradio output elements, in order
-    return img_np, output, output
+    return img_np, csv_data, output_path
 
 
 # Will sort and remove incorrect bounding boxes
 # Sorts based on y coordinate first - effectively creates "rows" of bounding boxes
 # Then will sort on the x coordinate - takes each "row" and determines which is the first name bbox and which is the last name bbox
 def sort_and_correct(bboxes, allowed_x_range, allowed_y_range):
+    
+    if not bboxes:
+        return []
     
     bboxes = sorted(bboxes, key=lambda bbox: bbox[0][1]) # Sorts all bboxes based on y coordinate (bbox[0][1])
     
@@ -173,11 +206,13 @@ def sort_and_correct(bboxes, allowed_x_range, allowed_y_range):
         previous_bbox = bbox
     
     # Once for loop finishes, fullname will have contents - write them and check for overlaps  
-    fullname_bbox = sorted(fullname_bbox, key = lambda bbox: bbox[0][0])
-    if (len(fullname_bbox) > 2): fullname_bbox = check_overlap(fullname_bbox)
-    
-    # Append final students bbox to sorted_bboxes
-    sorted_bboxes.append(fullname_bbox)
+    if fullname_bbox:
+        fullname_bbox = sorted(fullname_bbox, key=lambda bbox: bbox[0][0])
+        if len(fullname_bbox) > 2: 
+            fullname_bbox = check_overlap(fullname_bbox)
+        
+        # Append final students bbox to sorted_bboxes
+        sorted_bboxes.append(fullname_bbox)
     
     # Return the sorted bboxes
     return sorted_bboxes
@@ -216,5 +251,7 @@ def check_overlap(bboxes):
         
     # Handles edge case where potentially 3 or more bboxes overlap, continually check new_bboxes
     # If input list of bboxes matches what is output, no bboxes overlap and thus return
-    if (bboxes != new_bboxes and len(new_bboxes) > 2): check_overlap(new_bboxes)
-    else: return new_bboxes
+    if (bboxes != new_bboxes and len(new_bboxes) > 2): 
+        return check_overlap(new_bboxes)
+    else: 
+        return new_bboxes

@@ -53,16 +53,17 @@ def draw_BBOX(img):
     # Find coordinates for each whitespace found earlier
     # Draw a bounding box using the borders of each whitespace of acceptable size
     for i in range(1, retval):
-        # If the area is significantly larger than the average (mode), then it's probably not a cell in the table, or has been read incorrectly so we remove it
-        # If the area is too small, then we remove it as well
-        if area > (mode * 2) or area < 1000:
-            continue
-
         x = stats[i, cv.CC_STAT_LEFT]
         y = stats[i, cv.CC_STAT_TOP]
         w = stats[i, cv.CC_STAT_WIDTH]
         h = stats[i, cv.CC_STAT_HEIGHT]
         area = stats[i, cv.CC_STAT_AREA]
+        
+        # If the area is significantly larger than the average (mode), then it's probably not a cell in the table, or has been read incorrectly so we remove it
+        # If the area is too small, then we remove it as well
+        if area > (mode * 2) or area < 1000:
+            continue
+
         (cX, cY) = centroids[i]
         bbox = (x, y, w, h, cX, cY)
         bboxes.append(bbox)
@@ -100,8 +101,8 @@ def draw_BBOX(img):
             names_in_row.append(name)
 
             # Annotate the output image with recognized names
-            cv.rectangle(output, (x, y), (x + w, y + h), (0, j, 0), 2)
-            cv.putText(output, name, (int(cX), int(cY)),cv.FONT_HERSHEY_COMPLEX, 0.65, (255, 0, 0), 2)    
+            cv.rectangle(output, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv.putText(output, name, (int(cX), int(cY)), cv.FONT_HERSHEY_COMPLEX, 0.65, (255, 0, 0), 2)    
         names.append(names_in_row)
 
     # Create dataframe
